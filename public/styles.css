@@ -1,0 +1,17 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Parkinsans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0% 10%;
+  background-color: #ffffff;
+}
+
+#message-username p {
+  font-size: 14px;
+}

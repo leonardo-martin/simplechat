@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/public/styles.css" />
+    <link rel="icon" href="/public/favicon.ico" type="image/x-icon" />
+    <script src="/utils/constants.js"></script>
+    <title>Simple Chat</title>
+  </head>
+  <body>
+    <div class="container mx-auto">
+      <h2 class="text-2xl my-4">Simple Chat</h2>
+      <div class="border-b my-2"></div>
+      <div class="chat py-4"></div>
+
+      <form id="messageForm">
+        <input
+          type="text"
+          id="messageBox"
+          placeholder="Type your message here"
+        />
+        <button id="send" title="Send">➤</button>
+      </form>
+    </div>
+    <script>
+      let wsClient;
+
+      function getUsername() {
+        let userName = localStorage.getItem("username");
+
+        if (!userName) {
+          userName = prompt("Please enter an username:");
+
+          if (userName) {
+            localStorage.setItem("username", userName);
+          }
+        }
+
+        return userName;
+      }
+
+      const userName = getUsername();
+
+      const messageBox = document.querySelector("#messageBox");
+      const messageForm = document.querySelector("#messageForm");
+
+      messageForm.onsubmit = function (e) {
+        e.preventDefault();
+
+        const message = messageBox.value;
+
+        showMessageSent(
+          `<div id="message-single" class="flex flex-col items-end my-4">
+            <div id="message-username" class="flex gap-2 items-center">
+              <p class="font-medium text-blue-700">You</p>
+              <span class="text-xs text-gray-400">${getTimeNow()}</span>
+            </div>
+            <div class="bg-blue-100 mt-1 px-4 py-3">
+              <p class="text-sm max-w-2xl text-blue-950">
+                ${message}
+              </p>
+            </div>  
+          </div>
+          `
+        );
+        messageBox.value = "";
+
+        sendMessageToServer(message);
+      };
+
+      function init() {
+        if (wsClient) {
+          wsClient.onerror = wsClient.onopen = wsClient.onclose = null;
+          wsClient.close();
+        }
+
+        const URL = "ws://localhost:" + PORT;
+        wsClient = new WebSocket(URL);
+
+        wsClient.onopen = () => {
+          console.log("Connection to the WebSocket was established!");
+          const data = {
+            type: CLIENT.MESSAGE.NEW_USER,
+            payload: { userName },
+          };
+          wsClient.send(JSON.stringify(data));
+        };
+
+        wsClient.onmessage = (messageEvent) => {
+          const message = messageEvent.data;
+          const { type, payload } = JSON.parse(message);
+          switch (type) {
+            case SERVER.BROADCAST.NEW_USER:
+              showMessageReceived(
+                `<div class="text-center">
+                  <span class="inline-block mx-auto whitespace-nowrap rounded-full bg-amber-100 px-2.5 py-0.5 text-sm text-amber-700">
+                    ${payload.userName} has joined the chat
+                  </span>
+                </div>`
+              );
+              break;
+            case CLIENT.MESSAGE.NEW_MESSAGE:
+              showMessageReceived(
+                `<div id="message-single" class="my-4">
+                  <div id="message-username" class="flex gap-2 items-center">
+                    <p class="font-medium text-gray-500">${payload.userName}</p>
+                    <span class="inline-block text-xs text-gray-400">${payload.time}</span>
+                  </div>
+                  <div class="bg-gray-100 inline-block mt-1 px-4 py-3">
+                    <p class="text-sm max-w-2xl text-gray-600">
+                      ${payload.message}
+                    </p>
+                  </div>
+                  
+                </div>
+                `
+              );
+              break;
+            default:
+              break;
+          }
+        };
+
+        wsClient.onclose = (event) => {
+          showMessageReceived("No WebSocket connection :(");
+          wsClient = null;
+        };
+
+        wsClient.onerror = (event) => {
+          console.error("WebSocket error observed:", event);
+          wsClient = null;
+        };
+      }
+
+      function sendMessageToServer(message) {
+        if (!wsClient) {
+          showMessageReceived("No WebSocket connection :(");
+          return;
+        }
+        const data = {
+          type: CLIENT.MESSAGE.NEW_MESSAGE,
+          payload: { userName, message: message },
+        };
+
+        wsClient.send(JSON.stringify(data));
+      }
+
+      const messages = document.querySelector(".chat");
+
+      function showMessageSent(message) {
+        showNewMessage(message, "sending");
+      }
+      function showMessageReceived(message) {
+        showNewMessage(message, "receiving");
+      }
+
+      function showNewMessage(message, className) {
+        const textNode = document.createElement("div");
+        textNode.innerHTML = message;
+        textNode.className = "message";
+
+        const messageNode = document.createElement("div");
+        messageNode.className = "messages " + className;
+        messageNode.appendChild(textNode);
+
+        messages.appendChild(messageNode);
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      // Start the WebSocket server
+      init();
+    </script>
+  </body>
+</html>
