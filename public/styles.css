@@ -4,14 +4,29 @@ body {
 }
 
 body {
-  font-family: "Parkinsans", sans-serif;
+  font-family: "Noto Sans", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0% 10%;
-  background-color: #ffffff;
+  background-color: #f8f8f8;
+}
+
+#app {
+  overflow-x: hidden;
 }
 
 #message-username p {
   font-size: 14px;
+}
+
+.bg-lime {
+  background-color: #c5e1ea;
+}
+
+.color-text-base {
+  color: #646173;
+}
+
+.header {
+  border-bottom: 1px solid #e9e9e9;
 }

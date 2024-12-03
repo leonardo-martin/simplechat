@@ -7,9 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/public/styles.css" />
     <link rel="icon" href="/public/favicon.ico" type="image/x-icon" />
@@ -17,19 +18,48 @@
     <title>Simple Chat</title>
   </head>
   <body>
-    <div class="container mx-auto">
-      <h2 class="text-2xl my-4">Simple Chat</h2>
-      <div class="border-b my-2"></div>
-      <div class="chat py-4"></div>
-
-      <form id="messageForm">
-        <input
-          type="text"
-          id="messageBox"
-          placeholder="Type your message here"
-        />
-        <button id="send" title="Send">➤</button>
-      </form>
+    <div id="app" class="h-full w-full">
+      <div class="messages-history h-full w-full flex flex-col grow">
+        <div class="header flex items-center relative h-16 z-50">
+          <div class="container mx-auto">
+            <div class="flex">
+              <h2 class="text-2xl text-black">Simple Chat</h2>
+            </div>
+          </div>
+        </div>
+        <div class="container mx-auto chat relative order-2 z-10 flex-1"></div>
+        <form
+          id="messageForm"
+          class="container mx-auto relative w-full min-h-16 order-3 py-1.5 mb-6 flex gap-4"
+        >
+          <input
+            type="text"
+            id="messageBox"
+            placeholder="Type your message here"
+            class="flex-1 rounded-lg border-gray-200 shadow-sm sm:text-sm outline-none px-5 color-text-base"
+          />
+          <button
+            id="send"
+            class="inline-block rounded-full w-12 h-12 border border-black bg-black p-3 text-white hover:bg-transparent hover:text-indigo-600 focus:outline-none focus:ring active:text-indigo-500 transition duration-200"
+            href="#"
+          >
+            <svg
+              class="size-5 rtl:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
     </div>
     <script>
       let wsClient;
@@ -61,11 +91,11 @@
         showMessageSent(
           `<div id="message-single" class="flex flex-col items-end my-4">
             <div id="message-username" class="flex gap-2 items-center">
-              <p class="font-medium text-blue-700">You</p>
+              <p class="font-medium text-black">You</p>
               <span class="text-xs text-gray-400">${getTimeNow()}</span>
             </div>
-            <div class="bg-blue-100 mt-1 px-4 py-3">
-              <p class="text-sm max-w-2xl text-blue-950">
+            <div class="bg-white mt-1 px-4 py-3 rounded-md">
+              <p class="text-sm max-w-2xl color-text-base">
                 ${message}
               </p>
             </div>  
@@ -101,8 +131,8 @@
           switch (type) {
             case SERVER.BROADCAST.NEW_USER:
               showMessageReceived(
-                `<div class="text-center">
-                  <span class="inline-block mx-auto whitespace-nowrap rounded-full bg-amber-100 px-2.5 py-0.5 text-sm text-amber-700">
+                `<div class="text-center mt-6">
+                  <span class="inline-block mx-auto whitespace-nowrap rounded-full select-none bg-amber-100 px-2.5 py-0.5 text-sm text-amber-700">
                     ${payload.userName} has joined the chat
                   </span>
                 </div>`
@@ -112,11 +142,11 @@
               showMessageReceived(
                 `<div id="message-single" class="my-4">
                   <div id="message-username" class="flex gap-2 items-center">
-                    <p class="font-medium text-gray-500">${payload.userName}</p>
-                    <span class="inline-block text-xs text-gray-400">${payload.time}</span>
+                    <p class="font-medium text-black">${payload.userName}</p>
+                    <span class="inline-block text-xs text-gray-400 mt-1">${payload.time}</span>
                   </div>
-                  <div class="bg-gray-100 inline-block mt-1 px-4 py-3">
-                    <p class="text-sm max-w-2xl text-gray-600">
+                  <div class="bg-white inline-block mt-1 px-4 py-3 rounded-md">
+                    <p class="text-sm max-w-2xl color-text-base">
                       ${payload.message}
                     </p>
                   </div>
@@ -131,7 +161,13 @@
         };
 
         wsClient.onclose = (event) => {
-          showMessageReceived("No WebSocket connection :(");
+          showMessageReceived(
+            `<div class="text-center mt-6">
+              <span class="inline-block mx-auto whitespace-nowrap rounded-full select-none bg-red-100 px-2.5 py-0.5 text-sm text-red-700">
+                The WebSocket connection failed. Please refresh page or try again later.
+              </span>
+            </div>`
+          );
           wsClient = null;
         };
 
@@ -143,7 +179,13 @@
 
       function sendMessageToServer(message) {
         if (!wsClient) {
-          showMessageReceived("No WebSocket connection :(");
+          showMessageReceived(
+            `<div class="text-center mt-6">
+              <span class="inline-block mx-auto whitespace-nowrap rounded-full select-none bg-red-100 px-2.5 py-0.5 text-sm text-red-700">
+                The WebSocket connection failed. Please refresh page or try again later.
+              </span>
+            </div>`
+          );
           return;
         }
         const data = {
@@ -175,6 +217,8 @@
         messages.appendChild(messageNode);
         messages.scrollTop = messages.scrollHeight;
       }
+
+      function showError(message, classname) {}
 
       // Start the WebSocket server
       init();

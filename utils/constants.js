@@ -16,11 +16,10 @@ const SERVER = {
 
 const getTimeNow = () => {
   const NOW = new Date();
-  const HOURS = NOW.getHours();
-  const MINUTES = NOW.getMinutes();
-  const SECONDS = NOW.getSeconds();
+  const HOURS = NOW.getHours().toString().padStart(2, "0");
+  const MINUTES = NOW.getMinutes().toString().padStart(2, "0");
 
-  const CURRENT_TIME = `${HOURS}:${MINUTES}:${SECONDS}`;
+  const CURRENT_TIME = `${HOURS}:${MINUTES}`;
 
   return CURRENT_TIME;
 };
