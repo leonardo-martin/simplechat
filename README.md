@@ -38,6 +38,12 @@ Welcome to the **Simple Chat App**! This is a lightweight chat application built
 
 ---
 
+## 📷 Screenshot
+
+![image](https://github.com/user-attachments/assets/e8b00bb4-c11f-4f9e-9524-5deb6d52e30a)
+
+---
+
 ## 📚 What I Learned
 
 This project was a great opportunity to learn and practice:
