@@ -24,7 +24,7 @@ Welcome to the **Simple Chat App**! This is a lightweight chat application built
 
 ## 📦 Installation
 
-1. git clone https://github.com/leonardo-martin/simple-chat-app.gitcd simple-chat-app
+1. git clone https://github.com/leonardo-martin/simple-chat-app.git cd simple-chat-app
 1. npm install
 1. npm run dev
 1. http://localhost:8080
