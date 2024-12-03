@@ -67,7 +67,7 @@ This project is **in progress**. Future improvements include:
 
 Feel free to reach out if you have any questions or suggestions:
 
-- **GitHub**: [your-username](https://github.com/leonardo-martin)
+- **GitHub**: leonardo-martin(https://github.com/leonardo-martin)
 - **Email**: sanfelixleo@gmail.com
 
 ---
